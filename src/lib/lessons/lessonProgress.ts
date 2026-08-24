@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import { ALL_LESSONS, getLessonsByTier } from "@/data/lessons";
 
 export interface LessonRecord {
@@ -26,27 +27,53 @@ export interface OverallProgressStats {
 
 const STORAGE_KEY = "typing_platform_lesson_progress";
 
+export const EMPTY_COMPLETED_LESSONS: Record<string, LessonRecord> = Object.freeze({});
+
+// Memory cache for reference stability (React useSyncExternalStore compliance)
+let rawCache: string | null = null;
+let storeCache: Record<string, LessonRecord> | null = null;
+
 export function getCompletedLessons(): Record<string, LessonRecord> {
-  if (typeof window === "undefined") return {};
+  if (typeof window === "undefined") return EMPTY_COMPLETED_LESSONS;
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as Record<string, LessonRecord>;
+    if (raw === rawCache && storeCache) {
+      return storeCache;
+    }
+    rawCache = raw;
+    if (!raw) {
+      storeCache = EMPTY_COMPLETED_LESSONS;
+      return storeCache;
+    }
+    storeCache = JSON.parse(raw) as Record<string, LessonRecord>;
+    return storeCache;
   } catch (err) {
     console.error("Failed to parse lesson progress from localStorage:", err);
-    return {};
+    return EMPTY_COMPLETED_LESSONS;
   }
 }
 
-export function isLessonUnlocked(lessonNumber: number): boolean {
+export function subscribeLessonProgress(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("typing_lesson_progress_updated", onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("typing_lesson_progress_updated", onStoreChange);
+  };
+}
+
+export function isLessonUnlocked(
+  lessonNumber: number,
+  completedRecords: Record<string, LessonRecord> = getCompletedLessons()
+): boolean {
   // Lesson 1 is always unlocked
   if (lessonNumber <= 1) return true;
 
-  const records = getCompletedLessons();
   // Lesson N is unlocked if Lesson N-1 is completed
   const previousLessonId = `lesson-${lessonNumber - 1}`;
-  return Boolean(records[previousLessonId]?.completed);
+  return Boolean(completedRecords[previousLessonId]?.completed);
 }
 
 export function saveLessonCompletion(
@@ -57,7 +84,7 @@ export function saveLessonCompletion(
   if (typeof window === "undefined") return;
 
   try {
-    const records = getCompletedLessons();
+    const records = { ...getCompletedLessons() };
     records[lessonId] = {
       lessonId,
       completed: true,
@@ -65,14 +92,24 @@ export function saveLessonCompletion(
       accuracy: Math.max(records[lessonId]?.accuracy || 0, accuracy),
       completedAt: new Date().toISOString(),
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    const raw = JSON.stringify(records);
+    localStorage.setItem(STORAGE_KEY, raw);
+    rawCache = raw;
+    storeCache = records;
+
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("typing_lesson_progress_updated"));
+      }
+    }, 0);
   } catch (err) {
     console.error("Failed to save lesson completion to localStorage:", err);
   }
 }
 
-export function calculateProgressStats(): OverallProgressStats {
-  const records = getCompletedLessons();
+export function calculateProgressStats(
+  records: Record<string, LessonRecord> = getCompletedLessons()
+): OverallProgressStats {
   const totalLessons = ALL_LESSONS.length;
 
   const completedIds = Object.keys(records).filter((id) => records[id]?.completed);
@@ -110,5 +147,23 @@ export function calculateProgressStats(): OverallProgressStats {
     advancedTotal: advancedList.length,
     advancedPercent: Math.round((advancedCompleted / advancedList.length) * 100),
     nextUnlockedLessonNumber: nextUnlocked,
+  };
+}
+
+const getServerSnapshot = () => EMPTY_COMPLETED_LESSONS;
+
+export function useLessonProgress() {
+  const completedRecords = useSyncExternalStore(
+    subscribeLessonProgress,
+    getCompletedLessons,
+    getServerSnapshot
+  );
+
+  const stats = calculateProgressStats(completedRecords);
+
+  return {
+    completedRecords,
+    stats,
+    isUnlocked: (lessonNumber: number) => isLessonUnlocked(lessonNumber, completedRecords),
   };
 }

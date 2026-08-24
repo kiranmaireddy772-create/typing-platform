@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useSyncExternalStore } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ALL_LESSONS,
@@ -8,36 +8,19 @@ import {
   getLessonByNumber,
   LessonTier,
 } from "@/data/lessons";
-import {
-  getCompletedLessons,
-  isLessonUnlocked,
-  calculateProgressStats,
-} from "@/lib/lessons/lessonProgress";
+import { useLessonProgress } from "@/lib/lessons/lessonProgress";
 import { LessonCard } from "./LessonCard";
 import { BookOpen, Sparkles, Trophy, Award, ArrowRight } from "lucide-react";
 
-const emptySubscribe = () => () => {};
-
-function useIsMounted() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-}
-
 export function LessonDashboard() {
-  const isMounted = useIsMounted();
+  const { completedRecords, stats, isUnlocked } = useLessonProgress();
   const [activeTab, setActiveTab] = useState<LessonTier | "all">("all");
-
-  const stats = isMounted ? calculateProgressStats() : null;
-  const completedRecords = isMounted ? getCompletedLessons() : {};
 
   const beginnerLessons = getLessonsByTier("beginner");
   const intermediateLessons = getLessonsByTier("intermediate");
   const advancedLessons = getLessonsByTier("advanced");
 
-  const nextLesson = stats ? getLessonByNumber(stats.nextUnlockedLessonNumber) : undefined;
+  const nextLesson = getLessonByNumber(stats.nextUnlockedLessonNumber);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-10">
@@ -80,7 +63,7 @@ export function LessonDashboard() {
                 <Trophy className="h-4 w-4 text-amber-400" /> Overall Completion
               </div>
               <span className="font-mono text-xl font-bold text-indigo-400">
-                {stats?.overallPercent || 0}%
+                {stats.overallPercent}%
               </span>
             </div>
 
@@ -88,12 +71,12 @@ export function LessonDashboard() {
             <div className="w-full h-3 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-600 to-emerald-400 transition-all duration-500 rounded-full"
-                style={{ width: `${stats?.overallPercent || 0}%` }}
+                style={{ width: `${stats.overallPercent}%` }}
               />
             </div>
 
             <div className="flex justify-between text-xs text-slate-400 font-mono">
-              <span>{stats?.totalCompleted || 0} / {ALL_LESSONS.length} Lessons</span>
+              <span>{stats.totalCompleted} / {ALL_LESSONS.length} Lessons</span>
               <span>15 Total Modules</span>
             </div>
           </div>
@@ -109,13 +92,13 @@ export function LessonDashboard() {
               <Award className="h-4 w-4" /> Beginner Tier
             </span>
             <span className="font-mono text-sm font-bold text-white">
-              {stats?.beginnerCompleted || 0}/{beginnerLessons.length}
+              {stats.beginnerCompleted}/{beginnerLessons.length}
             </span>
           </div>
           <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
             <div
               className="h-full bg-indigo-500 transition-all duration-500 rounded-full"
-              style={{ width: `${stats?.beginnerPercent || 0}%` }}
+              style={{ width: `${stats.beginnerPercent}%` }}
             />
           </div>
           <p className="text-xs text-slate-400">Lessons 1–5: Posture, Home Row & Guide Keys</p>
@@ -128,13 +111,13 @@ export function LessonDashboard() {
               <Award className="h-4 w-4" /> Intermediate Tier
             </span>
             <span className="font-mono text-sm font-bold text-white">
-              {stats?.intermediateCompleted || 0}/{intermediateLessons.length}
+              {stats.intermediateCompleted}/{intermediateLessons.length}
             </span>
           </div>
           <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
             <div
               className="h-full bg-sky-500 transition-all duration-500 rounded-full"
-              style={{ width: `${stats?.intermediatePercent || 0}%` }}
+              style={{ width: `${stats.intermediatePercent}%` }}
             />
           </div>
           <p className="text-xs text-slate-400">Lessons 6–10: Top/Bottom Row, Shift, Numbers & Punctuation</p>
@@ -147,13 +130,13 @@ export function LessonDashboard() {
               <Award className="h-4 w-4" /> Advanced Tier
             </span>
             <span className="font-mono text-sm font-bold text-white">
-              {stats?.advancedCompleted || 0}/{advancedLessons.length}
+              {stats.advancedCompleted}/{advancedLessons.length}
             </span>
           </div>
           <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
             <div
               className="h-full bg-emerald-500 transition-all duration-500 rounded-full"
-              style={{ width: `${stats?.advancedPercent || 0}%` }}
+              style={{ width: `${stats.advancedPercent}%` }}
             />
           </div>
           <p className="text-xs text-slate-400">Lessons 11–15: Sentences, Paragraphs & Speed Certification</p>
@@ -193,7 +176,7 @@ export function LessonDashboard() {
               <LessonCard
                 key={lesson.id}
                 lesson={lesson}
-                isUnlocked={isLessonUnlocked(lesson.lessonNumber)}
+                isUnlocked={isUnlocked(lesson.lessonNumber)}
                 record={completedRecords[lesson.id]}
               />
             ))}
@@ -214,7 +197,7 @@ export function LessonDashboard() {
               <LessonCard
                 key={lesson.id}
                 lesson={lesson}
-                isUnlocked={isLessonUnlocked(lesson.lessonNumber)}
+                isUnlocked={isUnlocked(lesson.lessonNumber)}
                 record={completedRecords[lesson.id]}
               />
             ))}
@@ -235,7 +218,7 @@ export function LessonDashboard() {
               <LessonCard
                 key={lesson.id}
                 lesson={lesson}
-                isUnlocked={isLessonUnlocked(lesson.lessonNumber)}
+                isUnlocked={isUnlocked(lesson.lessonNumber)}
                 record={completedRecords[lesson.id]}
               />
             ))}

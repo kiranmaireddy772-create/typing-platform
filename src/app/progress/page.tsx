@@ -3,7 +3,7 @@
 import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { getPersonalBest } from "@/lib/typing/typingStorage";
-import { calculateProgressStats } from "@/lib/lessons/lessonProgress";
+import { useLessonProgress } from "@/lib/lessons/lessonProgress";
 import { getAllGameScores } from "@/lib/games/gameStorage";
 import { getDailyChallengeStore } from "@/lib/challenges/challengeStorage";
 import { Trophy, Zap, BookOpen, Flame, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
@@ -17,11 +17,12 @@ export default function ProgressPage() {
     () => false
   );
 
+  const { stats: lessonStats } = useLessonProgress();
+
   const pb15 = isMounted ? getPersonalBest(15) : null;
   const pb30 = isMounted ? getPersonalBest(30) : null;
   const pb60 = isMounted ? getPersonalBest(60) : null;
 
-  const lessonStats = isMounted ? calculateProgressStats() : null;
   const gameScores = isMounted ? getAllGameScores() : { wordSprint: null, fallingWords: null, accuracy: null };
   const dailyStore = isMounted ? getDailyChallengeStore() : { currentStreak: 0, longestStreak: 0, dailyResults: {} };
 
@@ -119,18 +120,18 @@ export default function ProgressPage() {
               <div>
                 <div className="text-sm font-bold text-white">Overall Course Completion</div>
                 <div className="text-xs text-slate-400 mt-0.5">
-                  {lessonStats?.totalCompleted || 0} of 15 Lessons Completed
+                  {lessonStats.totalCompleted} of 15 Lessons Completed
                 </div>
               </div>
               <div className="text-2xl font-extrabold font-mono text-indigo-400">
-                {lessonStats?.overallPercent || 0}%
+                {lessonStats.overallPercent}%
               </div>
             </div>
 
             <div className="w-full h-3 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
               <div
                 className="h-full bg-gradient-to-r from-indigo-600 to-emerald-400 transition-all duration-500 rounded-full"
-                style={{ width: `${lessonStats?.overallPercent || 0}%` }}
+                style={{ width: `${lessonStats.overallPercent}%` }}
               />
             </div>
           </div>

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Lesson, getNextLesson } from "@/data/lessons";
-import { saveLessonCompletion } from "@/lib/lessons/lessonProgress";
+import { saveLessonCompletion, useLessonProgress } from "@/lib/lessons/lessonProgress";
 import { useTypingEngine } from "@/hooks/useTypingEngine";
 import { TypingText } from "@/components/typing/TypingText";
 import { TypingKeyboard } from "@/components/typing/TypingKeyboard";
@@ -22,10 +22,13 @@ import {
 
 interface LessonRunnerProps {
   lesson: Lesson;
-  isUnlocked: boolean;
+  initialIsUnlocked?: boolean;
 }
 
-export function LessonRunner({ lesson, isUnlocked }: LessonRunnerProps) {
+export function LessonRunner({ lesson, initialIsUnlocked }: LessonRunnerProps) {
+  const { isUnlocked: checkIsUnlocked } = useLessonProgress();
+  const isUnlocked = checkIsUnlocked(lesson.lessonNumber) || Boolean(initialIsUnlocked);
+
   const [step, setStep] = useState<"theory" | "practice" | "complete">(
     lesson.type === "theory" ? "theory" : "practice"
   );

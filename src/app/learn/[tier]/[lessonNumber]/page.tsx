@@ -1,7 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { getLessonByNumber } from "@/data/lessons";
-import { isLessonUnlocked } from "@/lib/lessons/lessonProgress";
 import { LessonRunner } from "@/components/lessons/LessonRunner";
 
 interface PageProps {
@@ -40,11 +39,9 @@ export default async function IndividualLessonPage({ params }: PageProps) {
     notFound();
   }
 
-  const unlocked = isLessonUnlocked(num);
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
-      <LessonRunner lesson={lesson} isUnlocked={unlocked} />
+      <LessonRunner lesson={lesson} />
     </div>
   );
 }
