@@ -1,0 +1,101 @@
+import { Lesson } from "./types";
+
+export const BEGINNER_LESSONS: Lesson[] = [
+  {
+    id: "lesson-1",
+    tier: "beginner",
+    lessonNumber: 1,
+    title: "Meet the Keyboard",
+    subtitle: "Posture & Guide Keys",
+    description: "Understand the QWERTY keyboard layout, proper posture, and how to locate guide keys F and J.",
+    objectives: [
+      "Sit upright with elbows at 90 degrees",
+      "Feel the physical tactile bumps on the F and J keys",
+      "Understand the home-row concept",
+    ],
+    type: "theory",
+    theoryText:
+      "Touch typing means typing without looking at your physical keyboard. Notice the small tactile bumps on your index finger keys: F for your left index finger, and J for your right index finger. These two guide keys anchor your hands on the keyboard.",
+    practiceText: "f j f j ff jj fff jjj f j f j ff jj fff jjj",
+    targetKeys: ["F", "J"],
+    minAccuracy: 85,
+    estimatedMinutes: 3,
+  },
+  {
+    id: "lesson-2",
+    tier: "beginner",
+    lessonNumber: 2,
+    title: "Home Row Basics",
+    subtitle: "A S D F & J K L ;",
+    description: "Position all eight fingers on the central home row and practice basic keystrokes.",
+    objectives: [
+      "Position left hand fingers on A, S, D, F",
+      "Position right hand fingers on J, K, L, ;",
+      "Practice returning to home row after every keypress",
+    ],
+    type: "key_practice",
+    theoryText:
+      "Place your left pinky on A, ring finger on S, middle on D, and index on F. Place your right index on J, middle on K, ring on L, and right pinky on ; (semicolon). Both thumbs rest lightly on the spacebar.",
+    practiceText: "a s d f j k l ; asdf jkl; a s d f j k l ; asdf jkl;",
+    targetKeys: ["A", "S", "D", "F", "J", "K", "L", ";"],
+    minAccuracy: 85,
+    estimatedMinutes: 4,
+  },
+  {
+    id: "lesson-3",
+    tier: "beginner",
+    lessonNumber: 3,
+    title: "Left Hand Mastery",
+    subtitle: "A S D F Focus",
+    description: "Isolate and strengthen left-hand finger independence across the home row.",
+    objectives: [
+      "Master left pinky (A), ring (S), middle (D), and index (F)",
+      "Build rhythm without looking down",
+    ],
+    type: "key_practice",
+    theoryText:
+      "Focus on relaxing your left hand. Make small, crisp movements with your left fingers while keeping your wrist level.",
+    practiceText: "a s d f as df fd sa aa ss dd ff asdf fdsa asdf",
+    targetKeys: ["A", "S", "D", "F"],
+    minAccuracy: 85,
+    estimatedMinutes: 4,
+  },
+  {
+    id: "lesson-4",
+    tier: "beginner",
+    lessonNumber: 4,
+    title: "Right Hand Mastery",
+    subtitle: "J K L ; Focus",
+    description: "Isolate and strengthen right-hand finger independence across the home row.",
+    objectives: [
+      "Master right index (J), middle (K), ring (L), and pinky (;)",
+      "Build right-hand accuracy",
+    ],
+    type: "key_practice",
+    theoryText:
+      "Keep your right hand centered over J, K, L, and ;. Use your right thumb to tap the spacebar when transitioning between words.",
+    practiceText: "j k l ; jk l; ;l kj jj kk ll ;; jkl; ;lkj jkl;",
+    targetKeys: ["J", "K", "L", ";"],
+    minAccuracy: 85,
+    estimatedMinutes: 4,
+  },
+  {
+    id: "lesson-5",
+    tier: "beginner",
+    lessonNumber: 5,
+    title: "Home Row Words",
+    subtitle: "Building First Words",
+    description: "Combine left and right home-row letters to type your first full words.",
+    objectives: [
+      "Combine left and right home-row keys smoothly",
+      "Type words like sad, dad, ask, lad, fall, all",
+    ],
+    type: "word_practice",
+    theoryText:
+      "Now combine both hands! You can already type real words like sad, dad, ask, lad, fall, and all using only the home row.",
+    practiceText: "sad dad ask lad fall all a sad dad ask a lad fall all",
+    targetKeys: ["A", "S", "D", "F", "J", "K", "L", ";"],
+    minAccuracy: 88,
+    estimatedMinutes: 5,
+  },
+];
