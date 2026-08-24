@@ -3,11 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Keyboard, Menu, X, Sparkles, UserCheck } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Keyboard, Menu, X, Sparkles, User as UserIcon, LogIn } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const navLinks = [
     { name: "Learn", href: "/learn" },
@@ -17,6 +19,8 @@ export function Navbar() {
     { name: "Progress", href: "/progress" },
     { name: "About", href: "/about" },
   ];
+
+  const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -54,16 +58,28 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Desktop Right Side CTA & Sign In */}
+        {/* Desktop Right Side CTA & Auth Status */}
         <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
-            onClick={() => alert("Sign In will be available when authentication is added in a future phase.")}
-          >
-            <UserCheck className="h-4 w-4 text-slate-400" />
-            Sign In
-          </button>
+          {user ? (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:border-indigo-500/50 transition-all"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-mono text-white text-[11px]">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+              <span>{displayName}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            >
+              <LogIn className="h-4 w-4 text-slate-400" />
+              Sign In
+            </Link>
+          )}
+
           <Link
             href="/learn"
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/40 active:scale-95"
@@ -108,16 +124,25 @@ export function Navbar() {
               );
             })}
             <div className="mt-4 flex flex-col gap-2.5 border-t border-slate-800 pt-4">
-              <button
-                type="button"
-                className="w-full rounded-lg border border-slate-800 py-2.5 text-center text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  alert("Sign In will be available when authentication is added in a future phase.");
-                }}
-              >
-                Sign In
-              </button>
+              {user ? (
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800"
+                >
+                  <UserIcon className="h-4 w-4 text-indigo-400" />
+                  My Profile ({displayName})
+                </Link>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800 py-2.5 text-center text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+                >
+                  <LogIn className="h-4 w-4 text-slate-400" />
+                  Sign In
+                </Link>
+              )}
               <Link
                 href="/learn"
                 onClick={() => setMobileMenuOpen(false)}

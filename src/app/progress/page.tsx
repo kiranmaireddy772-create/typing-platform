@@ -2,15 +2,18 @@
 
 import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 import { getPersonalBest } from "@/lib/typing/typingStorage";
 import { useLessonProgress } from "@/lib/lessons/lessonProgress";
 import { getAllGameScores } from "@/lib/games/gameStorage";
 import { getDailyChallengeStore } from "@/lib/challenges/challengeStorage";
-import { Trophy, Zap, BookOpen, Flame, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { Trophy, Zap, BookOpen, Flame, Sparkles, ArrowRight, ShieldCheck, Cloud } from "lucide-react";
 
 const emptySubscribe = () => () => {};
 
 export default function ProgressPage() {
+  const { user } = useAuth();
+
   const isMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -185,11 +188,24 @@ export default function ProgressPage() {
           </div>
         </section>
 
-        {/* Local Storage Privacy Badge */}
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-emerald-400" />
-          <span>All statistics are saved locally in your web browser. No account or database required.</span>
-        </div>
+        {/* Local Storage / Cloud Sync Status Badge */}
+        {user ? (
+          <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-4 text-center text-xs text-indigo-300 flex items-center justify-center gap-2">
+            <Cloud className="h-4 w-4 text-indigo-400" />
+            <span>Cloud Sync Active for <strong>{user.email}</strong>. Progress is backed up to Supabase.</span>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+            <span>
+              All statistics are saved locally in your browser.{" "}
+              <Link href="/auth/login" className="text-indigo-400 underline font-semibold hover:text-indigo-300">
+                Sign in (Optional)
+              </Link>{" "}
+              to enable cloud backup across devices.
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
