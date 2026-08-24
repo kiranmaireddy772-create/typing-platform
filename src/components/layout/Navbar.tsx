@@ -16,6 +16,7 @@ export function Navbar() {
     { name: "Practice", href: "/practice" },
     { name: "Games", href: "/games" },
     { name: "Daily Challenge", href: "/challenges" },
+    { name: "Leaderboard", href: "/leaderboard" },
     { name: "Progress", href: "/progress" },
     { name: "About", href: "/about" },
   ];
