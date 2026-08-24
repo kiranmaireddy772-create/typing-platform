@@ -1,3 +1,5 @@
+import { saveGameScoreCloud } from "@/lib/supabase/syncStorage";
+
 export interface WordSprintBest {
   bestScore: number;
   bestWpm: number;
@@ -117,6 +119,9 @@ export function saveWordSprintScore(score: number, wpm: number, accuracy: number
       scoreCache[STORAGE_KEYS.wordSprint] = newBest;
       lastCombinedRawKey = ""; // Invalidate combined cache
       notifyGameScoresUpdated();
+
+      // Background cloud sync for logged-in users
+      saveGameScoreCloud("word_sprint", newBest.bestScore, newBest.bestWpm, newBest.bestAccuracy);
     } catch (err) {
       console.error("Failed to save Word Sprint score:", err);
     }
@@ -142,6 +147,9 @@ export function saveFallingWordsScore(score: number, level: number, accuracy: nu
       scoreCache[STORAGE_KEYS.fallingWords] = newBest;
       lastCombinedRawKey = ""; // Invalidate combined cache
       notifyGameScoresUpdated();
+
+      // Background cloud sync for logged-in users
+      saveGameScoreCloud("falling_words", newBest.bestScore, newBest.highestLevel, newBest.bestAccuracy);
     } catch (err) {
       console.error("Failed to save Falling Words score:", err);
     }
@@ -167,6 +175,9 @@ export function saveAccuracyScore(score: number, wpm: number, accuracy: number):
       scoreCache[STORAGE_KEYS.accuracy] = newBest;
       lastCombinedRawKey = ""; // Invalidate combined cache
       notifyGameScoresUpdated();
+
+      // Background cloud sync for logged-in users
+      saveGameScoreCloud("accuracy", newBest.bestScore, newBest.bestWpm, newBest.bestAccuracy);
     } catch (err) {
       console.error("Failed to save Accuracy score:", err);
     }

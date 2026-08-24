@@ -1,15 +1,38 @@
 "use client";
 
-import React, { useSyncExternalStore } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  fetchTypingLeaderboard,
+  fetchGameLeaderboard,
+  fetchStreakLeaderboard,
+  TypingLeaderboardEntry,
+  GameLeaderboardEntry,
+  StreakLeaderboardEntry,
+} from "@/lib/supabase/leaderboardService";
+import { LeaderboardTabs, LeaderboardCategory, TypingDuration, GameId } from "@/components/leaderboard/LeaderboardTabs";
+import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
+import { UserRankCard } from "@/components/leaderboard/UserRankCard";
 import { getPersonalBest } from "@/lib/typing/typingStorage";
 import { getAllGameScores } from "@/lib/games/gameStorage";
 import { getDailyChallengeStore } from "@/lib/challenges/challengeStorage";
-import { Trophy, Globe, Lock, ShieldCheck, Flame, Zap, Sparkles, ArrowRight } from "lucide-react";
+import { Trophy, Zap, Sparkles, Flame, ShieldCheck, ArrowRight } from "lucide-react";
 
 const emptySubscribe = () => () => {};
 
 export default function LeaderboardPage() {
+  const { user } = useAuth();
+  const [category, setCategory] = useState<LeaderboardCategory>("typing");
+  const [typingDuration, setTypingDuration] = useState<TypingDuration>(30);
+  const [gameId, setGameId] = useState<GameId>("word_sprint");
+
+  const [typingEntries, setTypingEntries] = useState<TypingLeaderboardEntry[]>([]);
+  const [gameEntries, setGameEntries] = useState<GameLeaderboardEntry[]>([]);
+  const [streakEntries, setStreakEntries] = useState<StreakLeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Local scores fallback via useSyncExternalStore
   const isMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -21,48 +44,85 @@ export default function LeaderboardPage() {
   const gameScores = isMounted ? getAllGameScores() : { wordSprint: null, fallingWords: null, accuracy: null };
   const dailyStore = isMounted ? getDailyChallengeStore() : { currentStreak: 0, longestStreak: 0, dailyResults: {} };
 
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        if (category === "typing") {
+          const data = await fetchTypingLeaderboard(typingDuration);
+          if (isSubscribed) setTypingEntries(data);
+        } else if (category === "games") {
+          const data = await fetchGameLeaderboard(gameId);
+          if (isSubscribed) setGameEntries(data);
+        } else if (category === "streaks") {
+          const data = await fetchStreakLeaderboard();
+          if (isSubscribed) setStreakEntries(data);
+        }
+      } finally {
+        if (isSubscribed) setLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [category, typingDuration, gameId]);
+
+  const currentUserDisplayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || null;
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 py-8 sm:py-12">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Header */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1 text-xs font-semibold text-amber-400">
-            <Trophy className="h-3.5 w-3.5" /> High Scores & Rankings
+            <Trophy className="h-3.5 w-3.5" /> High Scores & Global Rankings
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Leaderboard
+            Global Leaderboard
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-            Compare your personal typing achievements and local high scores.
+            Compete with typists worldwide across speed drills, arcade games, and daily challenge streaks.
           </p>
         </div>
 
-        {/* Global Leaderboard Notice Banner */}
-        <div className="rounded-3xl border border-indigo-500/30 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl text-center space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
-            <Globe className="h-7 w-7" />
-          </div>
+        {/* User Rank / Sign-in Card */}
+        <UserRankCard user={user} />
 
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-mono text-indigo-400">
-            <Lock className="h-3.5 w-3.5" /> Global Online Leaderboards Coming Soon
-          </div>
+        {/* Leaderboard Category & Duration Tabs */}
+        <LeaderboardTabs
+          category={category}
+          onCategoryChange={setCategory}
+          typingDuration={typingDuration}
+          onTypingDurationChange={setTypingDuration}
+          gameId={gameId}
+          onGameIdChange={setGameId}
+        />
 
-          <h2 className="text-2xl font-bold text-white">
-            Global Competition in Future Release
-          </h2>
+        {/* Live Leaderboard Table */}
+        <LeaderboardTable
+          category={category}
+          typingEntries={typingEntries}
+          gameEntries={gameEntries}
+          streakEntries={streakEntries}
+          currentUserDisplayName={currentUserDisplayName}
+          loading={loading}
+        />
 
-          <p className="max-w-md mx-auto text-sm text-slate-400 leading-relaxed">
-            Global online leaderboards will be unlocked when authentication and account features arrive in a future update. For now, view your personal local records below!
-          </p>
-        </div>
-
-        {/* Section: My Local High Scores */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-            <Trophy className="h-5 w-5 text-amber-400" />
-            <h2 className="text-xl font-bold text-white">My Local Hall of Fame</h2>
+        {/* Section: My Local Hall of Fame */}
+        <div className="space-y-6 pt-6">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-amber-400" />
+              <h2 className="text-xl font-bold text-white">My Local Hall of Fame</h2>
+            </div>
+            <span className="text-xs text-slate-400 font-mono">Saved in Browser</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +213,7 @@ export default function LeaderboardPage() {
 
         <div className="rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
           <ShieldCheck className="h-4 w-4 text-emerald-400" />
-          <span>Local high scores are saved safely in your web browser.</span>
+          <span>Local high scores are saved safely in your web browser. Cloud rankings update automatically for signed-in typists.</span>
         </div>
       </div>
     </div>

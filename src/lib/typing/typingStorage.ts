@@ -1,3 +1,5 @@
+import { savePersonalBestCloud } from "@/lib/supabase/syncStorage";
+
 export interface PersonalBest {
   wpm: number;
   accuracy: number;
@@ -55,6 +57,9 @@ export function savePersonalBest(
       rawCache[duration] = rawString;
       recordCache[duration] = newRecord;
       window.dispatchEvent(new Event("typing_pb_updated"));
+
+      // Background cloud sync for logged-in users
+      savePersonalBestCloud(duration, wpm, accuracy);
     } catch (err) {
       console.error("Failed to save personal best to localStorage:", err);
     }

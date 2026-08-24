@@ -1,5 +1,6 @@
 import { getLocalDateKey, isConsecutiveDay } from "./challengeDate";
 import { calculateDailyChallengeScore } from "./challengeScoring";
+import { saveDailyChallengeCloud } from "@/lib/supabase/syncStorage";
 
 export interface DailyResult {
   date: string;
@@ -141,6 +142,14 @@ function saveStoreToLocalStorage(newStore: DailyChallengeStore) {
           window.dispatchEvent(new Event("typing_daily_challenge_updated"));
         }
       }, 0);
+
+      // Background cloud sync for logged-in users
+      saveDailyChallengeCloud(
+        newStore.currentStreak,
+        newStore.longestStreak,
+        newStore.lastCompletedDate,
+        newStore.dailyResults
+      );
     } catch (err) {
       console.error("Failed to save daily challenge store to localStorage:", err);
     }

@@ -200,3 +200,74 @@ export async function syncLocalStorageToCloud(userId: string): Promise<boolean> 
     return false;
   }
 }
+
+// Background Cloud Save Helpers for Logged-In Users
+export async function savePersonalBestCloud(duration: number, wpm: number, accuracy: number): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from("user_personal_bests").upsert(
+      {
+        user_id: user.id,
+        duration,
+        wpm,
+        accuracy,
+        date: new Date().toISOString().split("T")[0],
+      },
+      { onConflict: "user_id,duration" }
+    );
+  } catch (err) {
+    console.error("Failed to sync personal best to cloud:", err);
+  }
+}
+
+export async function saveGameScoreCloud(
+  gameId: string,
+  bestScore: number,
+  metricValue: number,
+  bestAccuracy: number
+): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from("user_game_scores").upsert(
+      {
+        user_id: user.id,
+        game_id: gameId,
+        best_score: bestScore,
+        metric_value: metricValue,
+        best_accuracy: bestAccuracy,
+      },
+      { onConflict: "user_id,game_id" }
+    );
+  } catch (err) {
+    console.error("Failed to sync game score to cloud:", err);
+  }
+}
+
+export async function saveDailyChallengeCloud(
+  currentStreak: number,
+  longestStreak: number,
+  lastDate: string | null,
+  dailyResults: Record<string, unknown>
+): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from("user_daily_challenges").upsert({
+      user_id: user.id,
+      current_streak: currentStreak,
+      longest_streak: longestStreak,
+      last_completed_date: lastDate,
+      daily_results: dailyResults,
+    });
+  } catch (err) {
+    console.error("Failed to sync daily challenge to cloud:", err);
+  }
+}
