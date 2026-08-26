@@ -50,16 +50,20 @@ export function savePersonalBest(
     wpm > currentBest.wpm ||
     (wpm === currentBest.wpm && accuracy > currentBest.accuracy);
 
-  if (isNewBest && typeof window !== "undefined") {
-    try {
-      const rawString = JSON.stringify(newRecord);
-      localStorage.setItem(`${STORAGE_PREFIX}${duration}`, rawString);
-      rawCache[duration] = rawString;
-      recordCache[duration] = newRecord;
-      window.dispatchEvent(new Event("typing_pb_updated"));
+  const bestRecord = isNewBest ? newRecord : currentBest || newRecord;
 
-      // Background cloud sync for logged-in users
-      savePersonalBestCloud(duration, wpm, accuracy);
+  if (typeof window !== "undefined") {
+    try {
+      if (isNewBest) {
+        const rawString = JSON.stringify(newRecord);
+        localStorage.setItem(`${STORAGE_PREFIX}${duration}`, rawString);
+        rawCache[duration] = rawString;
+        recordCache[duration] = newRecord;
+        window.dispatchEvent(new Event("typing_pb_updated"));
+      }
+
+      // Sync the user's best record for this duration to Supabase Cloud asynchronously
+      savePersonalBestCloud(duration, bestRecord.wpm, bestRecord.accuracy);
     } catch (err) {
       console.error("Failed to save personal best to localStorage:", err);
     }
@@ -67,6 +71,6 @@ export function savePersonalBest(
 
   return {
     isNewBest,
-    record: isNewBest ? newRecord : currentBest || newRecord,
+    record: bestRecord,
   };
 }
