@@ -7,6 +7,8 @@ import { getPersonalBest } from "@/lib/typing/typingStorage";
 import { useLessonProgress } from "@/lib/lessons/lessonProgress";
 import { getAllGameScores } from "@/lib/games/gameStorage";
 import { getDailyChallengeStore } from "@/lib/challenges/challengeStorage";
+import { KeyboardHeatmap } from "@/components/analytics/KeyboardHeatmap";
+import { AchievementGrid } from "@/components/achievements/AchievementGrid";
 import { Trophy, Zap, BookOpen, Flame, Sparkles, ArrowRight, ShieldCheck, Cloud } from "lucide-react";
 
 const emptySubscribe = () => () => {};
@@ -43,7 +45,7 @@ export default function ProgressPage() {
                 Your Typing Progress
               </h1>
               <p className="mt-3 text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-                Track your speed records, completed curriculum modules, arcade game high scores, and active daily streak.
+                Track your speed records, completed curriculum modules, key error analytics, and unlocked milestone badges.
               </p>
             </div>
 
@@ -103,8 +105,18 @@ export default function ProgressPage() {
           </div>
         </section>
 
-        {/* Section 2: Learning System Curriculum Progress */}
-        <section className="space-y-4 pt-4">
+        {/* Section 2: Keyboard Accuracy Heatmap */}
+        <section className="pt-2">
+          <KeyboardHeatmap />
+        </section>
+
+        {/* Section 3: Milestone Achievements Badges */}
+        <section className="pt-2">
+          <AchievementGrid />
+        </section>
+
+        {/* Section 4: Learning System Curriculum Progress */}
+        <section className="space-y-4 pt-2">
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
             <div className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-indigo-400" />
@@ -140,8 +152,8 @@ export default function ProgressPage() {
           </div>
         </section>
 
-        {/* Section 3: Arcade Game High Scores */}
-        <section className="space-y-4 pt-4">
+        {/* Section 5: Arcade Game High Scores */}
+        <section className="space-y-4 pt-2">
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-sky-400" />
@@ -192,7 +204,7 @@ export default function ProgressPage() {
         {user ? (
           <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-4 text-center text-xs text-indigo-300 flex items-center justify-center gap-2">
             <Cloud className="h-4 w-4 text-indigo-400" />
-            <span>Cloud Sync Active for <strong>{user.email}</strong>. Progress is backed up to Supabase.</span>
+            <span>Cloud Sync Active for <strong>{user.email}</strong>. Progress & Achievements are backed up to Supabase.</span>
           </div>
         ) : (
           <div className="rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4 text-center text-xs text-slate-400 flex items-center justify-center gap-2">

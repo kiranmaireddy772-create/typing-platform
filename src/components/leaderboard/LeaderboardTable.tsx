@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Trophy, Medal, Award } from "lucide-react";
 import {
   TypingLeaderboardEntry,
@@ -126,7 +127,12 @@ export function LeaderboardTable({
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600/20 text-indigo-400 font-mono text-xs border border-indigo-500/30">
                           {entry.display_name.charAt(0).toUpperCase()}
                         </div>
-                        <span>{entry.display_name}</span>
+                        <Link
+                          href={`/user/${encodeURIComponent(entry.username ?? entry.display_name)}`}
+                          className="hover:text-indigo-400 transition-colors"
+                        >
+                          {entry.display_name}
+                        </Link>
                         {isCurrentUser && (
                           <span className="rounded bg-indigo-500/20 border border-indigo-500/30 px-1.5 py-0.5 text-[10px] font-mono text-indigo-300">
                             YOU
@@ -167,7 +173,12 @@ export function LeaderboardTable({
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-600/20 text-sky-400 font-mono text-xs border border-sky-500/30">
                           {entry.display_name.charAt(0).toUpperCase()}
                         </div>
-                        <span>{entry.display_name}</span>
+                        <Link
+                          href={`/user/${encodeURIComponent(entry.username ?? entry.display_name)}`}
+                          className="hover:text-sky-400 transition-colors"
+                        >
+                          {entry.display_name}
+                        </Link>
                         {isCurrentUser && (
                           <span className="rounded bg-sky-500/20 border border-sky-500/30 px-1.5 py-0.5 text-[10px] font-mono text-sky-300">
                             YOU
@@ -210,7 +221,12 @@ export function LeaderboardTable({
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-600/20 text-amber-400 font-mono text-xs border border-amber-500/30">
                           {entry.display_name.charAt(0).toUpperCase()}
                         </div>
-                        <span>{entry.display_name}</span>
+                        <Link
+                          href={`/user/${encodeURIComponent(entry.username ?? entry.display_name)}`}
+                          className="hover:text-amber-400 transition-colors"
+                        >
+                          {entry.display_name}
+                        </Link>
                         {isCurrentUser && (
                           <span className="rounded bg-amber-500/20 border border-amber-500/30 px-1.5 py-0.5 text-[10px] font-mono text-amber-300">
                             YOU

@@ -329,3 +329,30 @@ export async function saveDailyChallengeCloud(
     console.error("Failed to sync daily challenge to cloud:", err);
   }
 }
+
+export async function syncAchievementCloud(achievementId: string): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+  try {
+    const sessionRes = await supabase.auth.getSession();
+    let user: User | null | undefined = sessionRes.data.session?.user;
+    if (!user) {
+      const userRes = await supabase.auth.getUser();
+      user = userRes.data.user;
+    }
+    if (!user) return;
+
+    const { error } = await supabase.from("user_achievements").upsert(
+      {
+        user_id: user.id,
+        achievement_id: achievementId,
+      },
+      { onConflict: "user_id,achievement_id" }
+    );
+
+    if (error) {
+      console.error("Error syncing achievement to cloud:", error);
+    }
+  } catch (err) {
+    console.error("Failed to sync achievement to cloud:", err);
+  }
+}

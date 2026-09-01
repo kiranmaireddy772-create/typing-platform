@@ -2,13 +2,24 @@
 
 import React, { useRef } from "react";
 import { useTypingEngine } from "@/hooks/useTypingEngine";
+import { Difficulty } from "@/data/typing-texts";
 import { TypingHeader } from "./TypingHeader";
 import { TypingText } from "./TypingText";
 import { TypingKeyboard } from "./TypingKeyboard";
 import { TypingControls } from "./TypingControls";
 import { TypingResults } from "./TypingResults";
 
-export function TypingPractice() {
+interface TypingPracticeProps {
+  initialDuration?: number;
+  initialDifficulty?: Difficulty;
+  overrideText?: string;
+}
+
+export function TypingPractice({
+  initialDuration = 30,
+  initialDifficulty = "intermediate",
+  overrideText,
+}: TypingPracticeProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -32,7 +43,7 @@ export function TypingPractice() {
     startTest,
     restartTest,
     handleVirtualKeyPress,
-  } = useTypingEngine(30, "intermediate");
+  } = useTypingEngine(initialDuration, initialDifficulty, overrideText);
 
   const focusContainer = () => {
     containerRef.current?.focus();
@@ -58,41 +69,38 @@ export function TypingPractice() {
       />
 
       {/* Main Typing Display */}
-      <TypingText
-        text={text}
-        charStates={charStates}
-        currentIndex={currentIndex}
-        status={status}
-        onFocusText={focusContainer}
-      />
-
-      {/* Controls */}
-      <TypingControls
-        status={status}
-        onStart={startTest}
-        onRestart={restartTest}
-      />
-
-      {/* Interactive Keyboard Visualization */}
-      <div className="w-full flex justify-center pt-2">
-        <TypingKeyboard
-          expectedKey={expectedKey}
-          pressedKey={pressedKey}
-          onKeyPress={handleVirtualKeyPress}
-        />
-      </div>
-
-      {/* Results Screen Modal */}
-      {status === "completed" && (
+      {status === "completed" ? (
         <TypingResults
           wpm={wpm}
           accuracy={accuracy}
-          errorCount={errorCount}
           correctCount={correctCount}
+          errorCount={errorCount}
           duration={selectedDuration}
           isNewPersonalBest={isNewPersonalBest}
           onTryAgain={restartTest}
         />
+      ) : (
+        <>
+          <TypingText
+            text={text}
+            charStates={charStates}
+            currentIndex={currentIndex}
+            status={status}
+            onFocusText={focusContainer}
+          />
+
+          <TypingControls
+            status={status}
+            onStart={startTest}
+            onRestart={restartTest}
+          />
+
+          <TypingKeyboard
+            pressedKey={pressedKey}
+            expectedKey={expectedKey}
+            onKeyPress={handleVirtualKeyPress}
+          />
+        </>
       )}
     </div>
   );

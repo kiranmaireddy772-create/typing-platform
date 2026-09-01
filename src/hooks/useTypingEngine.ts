@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef, useSyncExternalStore, useMemo
 import { getRandomPassage, Difficulty, TypingPassage } from "@/data/typing-texts";
 import { calculateWPM, calculateAccuracy } from "@/lib/typing/typingCalculations";
 import { savePersonalBest, getPersonalBest, PersonalBest } from "@/lib/typing/typingStorage";
+import { recordKeyAttempt } from "@/lib/analytics/keyAnalytics";
+import { checkAndUnlockAchievements } from "@/lib/achievements/achievementStorage";
 
 export type TestStatus = "idle" | "typing" | "completed";
 export type CharState = "untyped" | "correct" | "incorrect";
@@ -69,6 +71,25 @@ export function useTypingEngine(
 
   const [isNewPersonalBest, setIsNewPersonalBest] = useState<boolean>(false);
 
+  // Derive state reset when activePassage or selectedDuration changes (React recommended pattern)
+  const [prevPassageText, setPrevPassageText] = useState(activePassage.text);
+  const [prevDuration, setPrevDuration] = useState(selectedDuration);
+
+  if (activePassage.text !== prevPassageText || selectedDuration !== prevDuration) {
+    setPrevPassageText(activePassage.text);
+    setPrevDuration(selectedDuration);
+    setCharStates(new Array(activePassage.text.length).fill("untyped"));
+    setCurrentIndex(0);
+    setCorrectCount(0);
+    setErrorCount(0);
+    setTotalTypedCount(0);
+    setBackspaceCount(0);
+    setStatus("idle");
+    setTimeLeft(selectedDuration);
+    setElapsedSeconds(0);
+    setIsNewPersonalBest(false);
+  }
+
   // SSR-safe, reference-stable personal best store subscription
   const subscribePB = useCallback((onStoreChange: () => void) => {
     if (typeof window === "undefined") return () => {};
@@ -103,10 +124,14 @@ export function useTypingEngine(
     setErrorCount(0);
     setTotalTypedCount(0);
     setBackspaceCount(0);
+    setStatus("idle");
     setTimeLeft(duration);
     setElapsedSeconds(0);
-    setStatus("idle");
     setIsNewPersonalBest(false);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   }, []);
 
   // Expected next key for virtual keyboard highlight
@@ -136,6 +161,13 @@ export function useTypingEngine(
       );
 
       setIsNewPersonalBest(isNewBest);
+
+      // Evaluate milestone achievements
+      checkAndUnlockAchievements({
+        wpm: finalWpm,
+        accuracy: finalAcc,
+        duration: selectedDuration,
+      });
     },
     [selectedDuration]
   );
@@ -198,6 +230,9 @@ export function useTypingEngine(
       const targetChar = activePassage.text[currentIndex];
       const isCorrect = key === targetChar;
 
+      // Record keystroke analytics for key error heatmap
+      recordKeyAttempt(targetChar, isCorrect);
+
       setTotalTypedCount((prev) => prev + 1);
 
       if (isCorrect) {
@@ -255,43 +290,36 @@ export function useTypingEngine(
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [processKey]);
 
-  const restartTest = useCallback(() => {
-    const newPassage = overrideText
-      ? { id: "custom", difficulty: selectedDifficulty, text: overrideText }
-      : getRandomPassage(selectedDifficulty);
+  const setDuration = (duration: number) => {
+    setSelectedDuration(duration);
+  };
+
+  const setDifficulty = (difficulty: Difficulty) => {
+    setSelectedDifficulty(difficulty);
     if (!overrideText) {
-      setRandomPassage(newPassage);
+      setRandomPassage(getRandomPassage(difficulty));
     }
-    resetEngineState(newPassage, selectedDuration);
-  }, [overrideText, selectedDifficulty, selectedDuration, resetEngineState]);
+  };
 
-  const startTest = useCallback(() => {
-    if (status === "idle") {
-      setStatus("typing");
+  const startTest = () => {
+    resetEngineState(activePassage, selectedDuration);
+  };
+
+  const restartTest = () => {
+    if (!overrideText) {
+      const newP = getRandomPassage(selectedDifficulty);
+      setRandomPassage(newP);
+      resetEngineState(newP, selectedDuration);
+    } else {
+      resetEngineState(activePassage, selectedDuration);
     }
-  }, [status]);
+  };
 
-  const setDuration = useCallback(
-    (duration: number) => {
-      setSelectedDuration(duration);
-      resetEngineState(activePassage, duration);
-    },
-    [activePassage, resetEngineState]
-  );
-
-  const setDifficulty = useCallback(
-    (difficulty: Difficulty) => {
-      setSelectedDifficulty(difficulty);
-      const newPassage = overrideText
-        ? { id: "custom", difficulty, text: overrideText }
-        : getRandomPassage(difficulty);
-      if (!overrideText) {
-        setRandomPassage(newPassage);
-      }
-      resetEngineState(newPassage, selectedDuration);
-    },
-    [overrideText, selectedDuration, resetEngineState]
-  );
+  const handleVirtualKeyPress = (key: string) => {
+    setPressedKey(key);
+    setTimeout(() => setPressedKey(null), 150);
+    processKey(key);
+  };
 
   return {
     status,
@@ -316,6 +344,6 @@ export function useTypingEngine(
     setDifficulty,
     startTest,
     restartTest,
-    handleVirtualKeyPress: processKey,
+    handleVirtualKeyPress,
   };
 }

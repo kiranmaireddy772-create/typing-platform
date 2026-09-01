@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
 
 export interface TypingLeaderboardEntry {
+  username: string | null;
   display_name: string;
   avatar_url: string | null;
   duration: number;
@@ -10,6 +11,7 @@ export interface TypingLeaderboardEntry {
 }
 
 export interface GameLeaderboardEntry {
+  username: string | null;
   display_name: string;
   avatar_url: string | null;
   game_id: string;
@@ -19,6 +21,7 @@ export interface GameLeaderboardEntry {
 }
 
 export interface StreakLeaderboardEntry {
+  username: string | null;
   display_name: string;
   avatar_url: string | null;
   current_streak: number;
