@@ -1,6 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { getLessonByNumber } from "@/data/lessons";
+import { ALL_LESSONS, getLessonByNumber, getLessonById } from "@/data/lessons";
 import { LessonRunner } from "@/components/lessons/LessonRunner";
 
 interface PageProps {
@@ -10,10 +10,22 @@ interface PageProps {
   }>;
 }
 
+export async function generateStaticParams() {
+  return ALL_LESSONS.map((lesson) => ({
+    tier: lesson.tier.toLowerCase(),
+    lessonNumber: String(lesson.lessonNumber),
+  }));
+}
+
 export async function generateMetadata({ params }: PageProps) {
-  const { lessonNumber } = await params;
-  const num = parseInt(lessonNumber, 10);
-  const lesson = getLessonByNumber(num);
+  const resolvedParams = await Promise.resolve(params);
+  const lessonNumberStr = resolvedParams?.lessonNumber || "";
+  let num = parseInt(lessonNumberStr, 10);
+  if (isNaN(num)) {
+    num = parseInt(lessonNumberStr.replace(/\D/g, ""), 10);
+  }
+
+  const lesson = getLessonByNumber(num) || getLessonById(lessonNumberStr);
 
   if (!lesson) {
     return { title: "Lesson Not Found | Typing Platform" };
@@ -26,16 +38,23 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function IndividualLessonPage({ params }: PageProps) {
-  const { lessonNumber } = await params;
-  const num = parseInt(lessonNumber, 10);
+  const resolvedParams = await Promise.resolve(params);
+  const tierStr = resolvedParams?.tier || "";
+  const lessonNumberStr = resolvedParams?.lessonNumber || "";
 
+  let num = parseInt(lessonNumberStr, 10);
   if (isNaN(num)) {
+    num = parseInt(lessonNumberStr.replace(/\D/g, ""), 10);
+  }
+
+  const lesson = getLessonByNumber(num) || getLessonById(lessonNumberStr);
+
+  if (!lesson) {
     notFound();
   }
 
-  const lesson = getLessonByNumber(num);
-
-  if (!lesson) {
+  // Validate tier case-insensitively if specified
+  if (tierStr && lesson.tier.toLowerCase() !== tierStr.toLowerCase()) {
     notFound();
   }
 

@@ -48,6 +48,7 @@ export function useFallingWords() {
   const animFrameRef = useRef<number | null>(null);
   const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeRef = useRef<number | null>(null);
+  const usedWordsRef = useRef<Set<string>>(new Set());
 
   const accuracy = totalTypedChars > 0 ? Math.round((correctTypedChars / totalTypedChars) * 100) : 100;
 
@@ -72,20 +73,35 @@ export function useFallingWords() {
     [stopGameLoop]
   );
 
-  // Spawn a new falling word
+  // Spawn a new falling word avoiding recent repeats
   const spawnWord = useCallback((currentLevel: number) => {
     const difficulty = currentLevel === 1 ? "easy" : currentLevel === 2 ? "medium" : "hard";
-    const wordText = getRandomWord(difficulty);
-    const newWord: FallingWordItem = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      text: wordText,
-      xPercent: Math.floor(10 + Math.random() * 70),
-      yPercent: 0,
-      speed: 0.08 + currentLevel * 0.04, // Speed scales with level
-      typedLength: 0,
-    };
 
-    setWords((prev) => [...prev, newWord]);
+    setWords((prevWords) => {
+      if (prevWords.length >= 5) return prevWords;
+
+      // Combine currently active word texts + recent history to prevent duplicates
+      const activeTexts = new Set(prevWords.map((w) => w.text));
+      const combinedExclude = new Set([...Array.from(usedWordsRef.current), ...Array.from(activeTexts)]);
+
+      if (usedWordsRef.current.size > 40) {
+        usedWordsRef.current.clear();
+      }
+
+      const wordText = getRandomWord(difficulty, combinedExclude);
+      usedWordsRef.current.add(wordText);
+
+      const newWord: FallingWordItem = {
+        id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        text: wordText,
+        xPercent: Math.floor(10 + Math.random() * 70),
+        yPercent: 0,
+        speed: 0.08 + currentLevel * 0.04, // Speed scales with level
+        typedLength: 0,
+      };
+
+      return [...prevWords, newWord];
+    });
   }, []);
 
   // Main game animation tick
@@ -98,12 +114,7 @@ export function useFallingWords() {
     // Spawning interval
     const spawnIntervalMs = Math.max(1200, 2800 - level * 300);
     spawnTimerRef.current = setInterval(() => {
-      setWords((currentWords) => {
-        if (currentWords.length < 5) {
-          spawnWord(level);
-        }
-        return currentWords;
-      });
+      spawnWord(level);
     }, spawnIntervalMs);
 
     // Animation frame tick
@@ -237,6 +248,7 @@ export function useFallingWords() {
 
   const startGame = useCallback(() => {
     stopGameLoop();
+    usedWordsRef.current.clear();
     setWords([]);
     setActiveWordId(null);
     setLives(3);

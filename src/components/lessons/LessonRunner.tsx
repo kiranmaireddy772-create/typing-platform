@@ -234,6 +234,8 @@ export function LessonRunner({ lesson, initialIsUnlocked }: LessonRunnerProps) {
             charStates={charStates}
             currentIndex={currentIndex}
             status={status}
+            tier={lesson.tier}
+            chunks={lesson.chunks}
           />
 
           {/* Active Virtual Keyboard */}

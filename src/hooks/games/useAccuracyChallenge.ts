@@ -157,7 +157,7 @@ export function useAccuracyChallenge() {
   }, [processKey]);
 
   const startGame = useCallback(() => {
-    const nextPassage = getRandomAccuracyPassage();
+    const nextPassage = getRandomAccuracyPassage(passage.id);
     setPassage(nextPassage);
     setCharStates(new Array(nextPassage.text.length).fill("untyped"));
     setCurrentIndex(0);
@@ -168,7 +168,7 @@ export function useAccuracyChallenge() {
     setElapsedSeconds(0);
     setIsNewBest(false);
     setStatus("typing");
-  }, []);
+  }, [passage.id]);
 
   return {
     status,

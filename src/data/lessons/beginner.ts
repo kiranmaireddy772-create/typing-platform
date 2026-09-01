@@ -16,7 +16,8 @@ export const BEGINNER_LESSONS: Lesson[] = [
     type: "theory",
     theoryText:
       "Touch typing means typing without looking at your physical keyboard. Notice the small tactile bumps on your index finger keys: F for your left index finger, and J for your right index finger. These two guide keys anchor your hands on the keyboard.",
-    practiceText: "f j f j ff jj fff jjj f j f j ff jj fff jjj",
+    chunks: ["f f", "j j", "f j", "j f", "ff jj", "fff jjj", "fj fj", "ff jj ff jj"],
+    practiceText: "f f j j f j j f ff jj fff jjj fj fj ff jj ff jj",
     targetKeys: ["F", "J"],
     minAccuracy: 85,
     estimatedMinutes: 3,
@@ -36,7 +37,8 @@ export const BEGINNER_LESSONS: Lesson[] = [
     type: "key_practice",
     theoryText:
       "Place your left pinky on A, ring finger on S, middle on D, and index on F. Place your right index on J, middle on K, ring on L, and right pinky on ; (semicolon). Both thumbs rest lightly on the spacebar.",
-    practiceText: "a s d f j k l ; asdf jkl; a s d f j k l ; asdf jkl;",
+    chunks: ["a a", "s s", "d d", "f f", "j j", "k k", "l l", "; ;", "as df", "jk l;", "asdf jkl;"],
+    practiceText: "a a s s d d f f j j k k l l ; ; as df jk l; asdf jkl;",
     targetKeys: ["A", "S", "D", "F", "J", "K", "L", ";"],
     minAccuracy: 85,
     estimatedMinutes: 4,
@@ -55,6 +57,7 @@ export const BEGINNER_LESSONS: Lesson[] = [
     type: "key_practice",
     theoryText:
       "Focus on relaxing your left hand. Make small, crisp movements with your left fingers while keeping your wrist level.",
+    chunks: ["a s d f", "as df", "fd sa", "aa ss dd ff", "asdf fdsa asdf"],
     practiceText: "a s d f as df fd sa aa ss dd ff asdf fdsa asdf",
     targetKeys: ["A", "S", "D", "F"],
     minAccuracy: 85,
@@ -74,6 +77,7 @@ export const BEGINNER_LESSONS: Lesson[] = [
     type: "key_practice",
     theoryText:
       "Keep your right hand centered over J, K, L, and ;. Use your right thumb to tap the spacebar when transitioning between words.",
+    chunks: ["j k l ;", "jk l;", ";l kj", "jj kk ll ;;", "jkl; ;lkj jkl;"],
     practiceText: "j k l ; jk l; ;l kj jj kk ll ;; jkl; ;lkj jkl;",
     targetKeys: ["J", "K", "L", ";"],
     minAccuracy: 85,
@@ -93,6 +97,7 @@ export const BEGINNER_LESSONS: Lesson[] = [
     type: "word_practice",
     theoryText:
       "Now combine both hands! You can already type real words like sad, dad, ask, lad, fall, and all using only the home row.",
+    chunks: ["sad dad", "ask lad", "fall all", "a sad dad", "ask a lad", "fall all"],
     practiceText: "sad dad ask lad fall all a sad dad ask a lad fall all",
     targetKeys: ["A", "S", "D", "F", "J", "K", "L", ";"],
     minAccuracy: 88,

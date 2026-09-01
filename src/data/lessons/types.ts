@@ -18,6 +18,7 @@ export interface Lesson {
   type: LessonType;
   theoryText?: string;
   practiceText?: string;
+  chunks?: string[]; // Optional beginner chunk progression sequence
   targetKeys?: string[]; // Keys to highlight on virtual keyboard e.g. ["F", "J"]
   minAccuracy?: number; // e.g. 85 or 90
   estimatedMinutes: number;
