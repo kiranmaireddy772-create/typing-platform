@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Typing Platform Team" }],
   creator: "Typing Platform",
+    verification: {
+    google: "AI1rCZp9708PxeAZ9iqDhvQFxEBlCxIktrhrMQ6b3Fg",
+  },
   openGraph: {
     title: "Typing Platform — Learn, Practice & Improve Your Typing",
     description:
