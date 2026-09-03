@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { CharState } from "@/hooks/useTypingEngine";
 import { BeginnerChunkDisplay } from "@/components/lessons/BeginnerChunkDisplay";
+import { LessonChunkDisplay } from "@/components/lessons/LessonChunkDisplay";
 
 interface TypingTextProps {
   text: string;
@@ -24,27 +25,24 @@ export function TypingText({
   chunks,
 }: TypingTextProps) {
   const activeCharRef = useRef<HTMLSpanElement>(null);
-  const isBeginner = tier === "beginner";
+  const hasChunks = Boolean(chunks && chunks.length > 0);
 
-  // Use explicit chunks or auto-generate chunks for beginner tier
-  const activeChunks = chunks && chunks.length > 0 ? chunks : text ? text.split(" ") : [];
-
-  // Smooth scroll for intermediate / advanced passages
+  // Smooth scroll for standard practice passages without chunks
   useEffect(() => {
-    if (!isBeginner && activeCharRef.current && status === "typing") {
+    if (!hasChunks && activeCharRef.current && status === "typing") {
       activeCharRef.current.scrollIntoView({
         behavior: "smooth",
         block: "center",
         inline: "nearest",
       });
     }
-  }, [currentIndex, status, isBeginner]);
+  }, [currentIndex, status, hasChunks]);
 
-  // If Beginner Tier, render centered chunk-by-chunk learning display
-  if (isBeginner && activeChunks.length > 0) {
+  // 1. Beginner Tier uses dedicated BeginnerChunkDisplay
+  if (tier === "beginner" && hasChunks && chunks) {
     return (
       <BeginnerChunkDisplay
-        chunks={activeChunks}
+        chunks={chunks}
         text={text}
         charStates={charStates}
         currentIndex={currentIndex}
@@ -54,7 +52,22 @@ export function TypingText({
     );
   }
 
-  // Standard passage view for Intermediate & Advanced tiers
+  // 2. Intermediate and Advanced Tiers use LessonChunkDisplay for progressive chunks
+  if ((tier === "intermediate" || tier === "advanced") && hasChunks && chunks) {
+    return (
+      <LessonChunkDisplay
+        chunks={chunks}
+        text={text}
+        charStates={charStates}
+        currentIndex={currentIndex}
+        status={status}
+        onFocusText={onFocusText}
+        tier={tier}
+      />
+    );
+  }
+
+  // 3. Standard full-passage view for general practice & custom tests without chunks
   return (
     <div
       onClick={onFocusText}

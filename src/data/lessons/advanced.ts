@@ -15,7 +15,20 @@ export const ADVANCED_LESSONS: Lesson[] = [
     type: "word_practice",
     theoryText:
       "Advanced typing relies on chunking whole words into single fluid motions rather than individual keypresses.",
-    practiceText: "system function performance interface algorithm database component developer network optimize",
+    chunks: [
+      "system",
+      "function",
+      "interface",
+      "algorithm",
+      "system function",
+      "interface algorithm",
+      "system function performance",
+      "database component developer",
+      "software architecture data structure execution",
+      "type safe application development workflow",
+    ],
+    practiceText:
+      "system function interface algorithm system function interface algorithm system function performance database component developer software architecture data structure execution type safe application development workflow",
     minAccuracy: 92,
     estimatedMinutes: 6,
   },
@@ -33,7 +46,15 @@ export const ADVANCED_LESSONS: Lesson[] = [
     type: "sentence_practice",
     theoryText:
       "A steady, calm typing rhythm is much faster than bursts of speed followed by corrections.",
-    practiceText: "Clean code always reads like well-written prose. Consistency and clarity lead to high speed.",
+    chunks: [
+      "Clean code",
+      "Clean code always reads",
+      "Clean code always reads like well-written prose.",
+      "Consistency and clarity naturally lead to high typing speed.",
+      "Maintain a steady, calm rhythm across every long sentence.",
+    ],
+    practiceText:
+      "Clean code Clean code always reads Clean code always reads like well-written prose. Consistency and clarity naturally lead to high typing speed. Maintain a steady, calm rhythm across every long sentence.",
     minAccuracy: 92,
     estimatedMinutes: 6,
   },
@@ -51,7 +72,16 @@ export const ADVANCED_LESSONS: Lesson[] = [
     type: "sentence_practice",
     theoryText:
       "Endurance comes from keeping your hands relaxed and avoiding tension in your shoulders and wrists.",
-    practiceText: "Building strong touch typing skills requires patience and daily practice. As you master each key row, your fingers naturally find their positions without conscious effort.",
+    chunks: [
+      "Building skills",
+      "daily practice",
+      "Building strong touch typing skills requires patience.",
+      "Building strong touch typing skills requires patience and daily practice.",
+      "As you master each key row, your fingers naturally find their positions without conscious effort.",
+      "Endurance comes from keeping your wrists level, hands relaxed, and posture straight.",
+    ],
+    practiceText:
+      "Building skills daily practice Building strong touch typing skills requires patience. Building strong touch typing skills requires patience and daily practice. As you master each key row, your fingers naturally find their positions without conscious effort. Endurance comes from keeping your wrists level, hands relaxed, and posture straight.",
     minAccuracy: 92,
     estimatedMinutes: 7,
   },
@@ -69,7 +99,16 @@ export const ADVANCED_LESSONS: Lesson[] = [
     type: "assessment",
     theoryText:
       "Push your limits! Focus on quick key releases and swift hand movements.",
-    practiceText: "Fast typists move smoothly between keys. Keep your rhythm steady and watch your speed rise.",
+    chunks: [
+      "Fast typists",
+      "move smoothly",
+      "Fast typists move smoothly between keys.",
+      "Fast typists move smoothly between keys without tense pauses.",
+      "Keep your typing rhythm steady, release keys quickly, and watch your speed rise.",
+      "Push your limits today while keeping your accuracy strictly above ninety percent!",
+    ],
+    practiceText:
+      "Fast typists move smoothly Fast typists move smoothly between keys. Fast typists move smoothly between keys without tense pauses. Keep your typing rhythm steady, release keys quickly, and watch your speed rise. Push your limits today while keeping your accuracy strictly above ninety percent!",
     minAccuracy: 90,
     estimatedMinutes: 7,
   },
@@ -87,7 +126,15 @@ export const ADVANCED_LESSONS: Lesson[] = [
     type: "assessment",
     theoryText:
       "Congratulations on reaching the final assessment! Show off your touch-typing skills across this comprehensive graduation test.",
-    practiceText: "Congratulations! You have completed the Typing Platform touch-typing curriculum. Your dedication to proper posture, home row positioning, and daily practice has built lifelong typing speed and precision.",
+    chunks: [
+      "Congratulations",
+      "graduation assessment",
+      "Congratulations on reaching the final touch-typing graduation assessment!",
+      "Your dedication to home row posture, finger independence, and daily practice has built lifelong speed.",
+      "Demonstrate total mastery across letters, numbers, and symbols to claim your course certificate today!",
+    ],
+    practiceText:
+      "Congratulations graduation assessment Congratulations on reaching the final touch-typing graduation assessment! Your dedication to home row posture, finger independence, and daily practice has built lifelong speed. Demonstrate total mastery across letters, numbers, and symbols to claim your course certificate today!",
     minAccuracy: 92,
     estimatedMinutes: 8,
   },
