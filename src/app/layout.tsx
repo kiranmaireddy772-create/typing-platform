@@ -14,40 +14,66 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://typing-platform-eta.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Typing Platform — Learn, Practice & Improve Your Typing",
+    default: "Typing Platform – Free Typing Practice & Typing Tests",
     template: "%s | Typing Platform",
   },
   description:
-    "Improve your typing speed and accuracy with structured lessons, typing practice, fun games, and daily challenges.",
+    "Improve your typing speed and accuracy with free typing practice, lessons, typing tests, games, and daily challenges.",
   keywords: [
     "typing practice",
-    "touch typing lessons",
     "typing test",
-    "WPM speed test",
+    "typing speed",
+    "typing accuracy",
+    "learn typing",
     "typing games",
-    "word sprint",
-    "daily typing challenge",
+    "keyboard practice",
+    "WPM speed test",
+    "touch typing",
+    "free typing test",
   ],
   authors: [{ name: "Typing Platform Team" }],
   creator: "Typing Platform",
-    verification: {
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/logo.svg",
+  },
+  alternates: {
+    canonical: "./",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
     google: "AI1rCZp9708PxeAZ9iqDhvQFxEBlCxIktrhrMQ6b3Fg",
   },
   openGraph: {
-    title: "Typing Platform — Learn, Practice & Improve Your Typing",
+    title: "Typing Platform – Free Typing Practice & Typing Tests",
     description:
-      "Improve your typing speed and accuracy with structured lessons, typing practice, fun games, and daily challenges.",
+      "Improve your typing speed and accuracy with free typing practice, lessons, typing tests, games, and daily challenges.",
+    url: SITE_URL,
     siteName: "Typing Platform",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Typing Platform — Learn, Practice & Improve Your Typing",
+    title: "Typing Platform – Free Typing Practice & Typing Tests",
     description:
-      "Improve your typing speed and accuracy with structured lessons, typing practice, fun games, and daily challenges.",
+      "Improve your typing speed and accuracy with free typing practice, lessons, typing tests, games, and daily challenges.",
   },
 };
 

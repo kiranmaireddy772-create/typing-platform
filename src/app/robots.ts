@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/"],
     },
-    sitemap: "https://typing-platform.vercel.app/sitemap.xml",
+    sitemap: "https://typing-platform-eta.vercel.app/sitemap.xml",
   };
 }

@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Keyboard, Menu, X, Sparkles, User as UserIcon, LogIn } from "lucide-react";
+import { Menu, X, Sparkles, User as UserIcon, LogIn } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -31,9 +32,14 @@ export function Navbar() {
           href="/"
           className="group flex items-center gap-2.5 text-lg font-bold tracking-tight text-white transition-opacity hover:opacity-90"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition-transform group-hover:scale-105">
-            <Keyboard className="h-5 w-5" />
-          </div>
+          <Image
+            src="/logo.svg"
+            alt="Typing Platform Logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-xl shadow-md shadow-indigo-600/30 transition-transform group-hover:scale-105"
+            priority
+          />
           <span className="flex items-center gap-1">
             Typing <span className="text-indigo-400">Platform</span>
           </span>

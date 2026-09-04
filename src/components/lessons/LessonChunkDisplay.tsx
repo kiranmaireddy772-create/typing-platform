@@ -149,6 +149,3 @@ export function LessonChunkDisplay({
     </div>
   );
 }
-
-// Backward compatibility alias
-export const BeginnerChunkDisplay = LessonChunkDisplay;

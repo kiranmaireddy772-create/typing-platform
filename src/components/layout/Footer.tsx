@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Keyboard } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -13,9 +13,13 @@ export function Footer() {
               href="/"
               className="flex items-center gap-2.5 text-lg font-bold text-white transition-opacity hover:opacity-90"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
-                <Keyboard className="h-4 w-4" />
-              </div>
+              <Image
+                src="/logo.svg"
+                alt="Typing Platform Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-lg shadow-md shadow-indigo-600/30"
+              />
               <span>
                 Typing <span className="text-indigo-400">Platform</span>
               </span>
