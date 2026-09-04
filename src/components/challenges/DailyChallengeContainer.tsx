@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDailyChallenge } from "@/hooks/challenges/useDailyChallenge";
 import { ChallengeHeader } from "./ChallengeHeader";
 import { StreakCard } from "./StreakCard";
@@ -23,11 +23,15 @@ export function DailyChallengeContainer() {
 
   const [saveInfo, setSaveInfo] = useState<{ isNewBestScore: boolean; result: DailyResult } | null>(null);
 
-  // Synchronous state adjustment on test completion (React 18 state adjustment pattern)
-  if (engine.status === "completed" && !saveInfo) {
-    const info = saveCurrentResult();
-    setSaveInfo({ isNewBestScore: info.isNewBestScore, result: info.result });
-  }
+  // Defer completion state synchronization to microtask queue to avoid synchronous effect cascading
+  useEffect(() => {
+    if (engine.status === "completed" && !saveInfo) {
+      Promise.resolve().then(() => {
+        const info = saveCurrentResult();
+        setSaveInfo({ isNewBestScore: info.isNewBestScore, result: info.result });
+      });
+    }
+  }, [engine.status, saveInfo, saveCurrentResult]);
 
   const handleStart = () => {
     setSaveInfo(null);
