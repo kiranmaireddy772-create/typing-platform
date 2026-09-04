@@ -35,7 +35,6 @@ export function DailyChallengeContainer() {
 
   const handleStart = () => {
     setSaveInfo(null);
-    engine.restartTest();
     engine.startTest();
   };
 

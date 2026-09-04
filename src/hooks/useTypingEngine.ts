@@ -303,6 +303,7 @@ export function useTypingEngine(
 
   const startTest = () => {
     resetEngineState(activePassage, selectedDuration);
+    setStatus("typing");
   };
 
   const restartTest = () => {
@@ -313,6 +314,7 @@ export function useTypingEngine(
     } else {
       resetEngineState(activePassage, selectedDuration);
     }
+    setStatus("typing");
   };
 
   const handleVirtualKeyPress = (key: string) => {
